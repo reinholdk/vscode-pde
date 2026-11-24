@@ -115,7 +115,7 @@ public class EclipseApplicationLaunchConfiguration extends AbstractPDELaunchConf
 
 		// add the output folder names
 		programArgs.add("-dev"); //$NON-NLS-1$
-		programArgs.add(ClasspathHelper.getDevEntriesProperties(getConfigDir(configuration).toString() + "/dev.properties", fAllBundles).toString()); //$NON-NLS-1$
+		programArgs.add(ClasspathHelper.getDevEntriesProperties(getConfigDir(configuration).toString() + "/dev.properties", 		fAllBundles).toUri().toString()); //$NON-NLS-1$
 		//		// necessary for PDE to know how to load plugins when target platform = host platform
 		//		// see PluginPathFinder.getPluginPaths() and PluginPathFinder.isDevLaunchMode()
 		//		IPluginModelBase base = fAllBundles.get(PDECore.PLUGIN_ID);

@@ -51,15 +51,20 @@ const pluginGlobs = [
     repo + 'org.eclipse.pde.junit.runtime_**',
     repo + 'org.eclipse.jdt.junit4.runtime_**',
     repo + 'javax.annotation_**',
-    repo + 'javax.inject_**',
     repo + 'biz.aQute.bnd.util_**',
     repo + 'biz.aQute.bndlib_**',
     repo + 'org.bndtools.versioncontrol.ignores.manager_**',
     repo + 'bndtools.api_**',
     repo + 'jakarta.annotation-api_**',
-    repo + 'jakarta.inject.jakarta.inject-api_**',
+    repo + 'jakarta.inject.jakarta.inject-api_2.*',
     repo + 'org.eclipse.m2e.pde.target_**',
+    repo + 'org.eclipse.m2e.versions.api_**',
+    repo + 'org.eclipse.m2e.versions.model_**',
+    repo + 'org.eclipse.m2e.versions.common_**',
+    repo + 'org.apache.commons.commons-collections4_**',
+    repo + 'stax2-api_**',
     repo + 'org.osgi.service.repository_**',
+    repo + 'org.osgi.service.event_**',
     repo + 'org.apache.commons.commons-io_**'
 ];
 
@@ -129,9 +134,11 @@ function findNewPDEPlugin(fileName) {
     fileName = fileName + "_";
     const destFolder = path.resolve('./server');
     const files = fs.readdirSync(destFolder);
-    const f = files.find((file) => {
-        return file.indexOf(fileName) >= 0;
-    });
+    const f = files.filter((file) => file.startsWith(fileName) && file.endsWith('.jar'))
+        .sort((a, b) => b.localeCompare(a, 'en', { numeric: true }))[0];
+    if (!f) {
+        throw new Error(`No PDE bundle matching ${fileName} found in ${destFolder}`);
+    }
     console.log(f);
     return f;
 }

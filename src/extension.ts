@@ -1,8 +1,9 @@
 
-import * as compareVersions from "compare-versions";
+import { compareVersions } from "compare-versions";
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+import { getLaunchProjectName } from "./projectName";
 
 const RECENTLY_USED_PDE_LAUNCH_FILE = "recentlyUsedPdeLaunchFile";
 const RECENTLY_USED_TARGET_FILE = "recentlyUsedTargetFile";
@@ -106,15 +107,12 @@ async function launchPDEApplication(context: vscode.ExtensionContext, uri: vscod
 
     updateUriCache(context, RECENTLY_USED_PDE_LAUNCH_FILE, uri);
     const launchArguments = <LaunchArguments> await vscode.commands.executeCommand("java.execute.workspaceCommand", "java.pde.resolveLaunchArguments", uri.toString());
-    let projectName;
-    const javaConfigFile = path.join(workspaceFolder.uri.fsPath, "javaConfig.json");
-    if (fs.existsSync(javaConfigFile)) {
-        const javaConfig = JSON.parse(fs.readFileSync(javaConfigFile).toString());
-        if (javaConfig && javaConfig.projects && javaConfig.projects.length) {
-            projectName = javaConfig.projects[0] || "";
-            const segments = projectName.split(/[\\/]/);
-            projectName = segments[segments.length - 1];
-        }
+    let projectName: string | undefined;
+    try {
+        projectName = getLaunchProjectName(workspaceFolder.uri.fsPath);
+    } catch (error) {
+        vscode.window.showErrorMessage(`Cannot read the launch project name: ${error instanceof Error ? error.message : String(error)}`);
+        return;
     }
 
     const insider = vscode.version.endsWith("-insider") ? "-insider" : "";
